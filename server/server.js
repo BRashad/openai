@@ -1,4 +1,4 @@
-import { Express } from "express";
+import express from "express";
 import * as dotenv from "dotenv";
 import cors from "cors";
 import { Configuration, OpenAIApi } from "openai";
@@ -26,6 +26,24 @@ app.get("/", async (req, res) => {
 app.post("/", async (req, res) => {
   try {
     const prompt = req.body.prompt;
-    const response = await openai.createCompletion({});
-  } catch (error) {}
+    const response = await openai.createCompletion({
+      model: "text-davinci-003",
+      prompt: `${prompt}`,
+      temperature: 0,
+      max_tokens: 3000,
+      top_p: 1,
+      frequency_penalty: 0.5,
+      presence_penalty: 0,
+    });
+    res.status(200).send({ bot: response.data.choices[0].text }); //send response to front-end
+  } catch (error) {
+    console.log(error);
+    res.status(500).send(error || "Something went wring");
+  }
 });
+
+//make sure that server listens to new requests
+
+app.listen(5005, () =>
+  console.log("AI server is running on port http://localhost:5005")
+);
